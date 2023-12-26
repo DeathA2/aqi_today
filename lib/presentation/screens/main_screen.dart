@@ -341,10 +341,27 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _renderAQILottie() {
-    return Lottie.asset(ImageApp.airQuality,
-        width: SizeApp.s300,
-        frameRate: FrameRate.max,
-        options: LottieOptions());
+    return BlocSelector<HomeCubit, HomeState, int>(
+      selector: (state) {
+        return state.aqiLive;
+      },
+      builder: (context, state) {
+        return Container(
+          width: 200,
+          height: 200,
+          color: setColor(state),
+        );
+      },
+    );
+  }
+
+  Color setColor(int aqi) {
+    if (aqi > 300) return const Color.fromARGB(255, 126, 0, 35);
+    if (aqi > 200) return const Color.fromARGB(255, 143, 63, 151);
+    if (aqi > 150) return const Color.fromARGB(255, 255, 0, 0);
+    if (aqi > 100) return const Color.fromARGB(255, 255, 126, 0);
+    if (aqi > 50) return const Color.fromARGB(255, 255, 255, 0);
+    return const Color.fromARGB(255, 0, 228, 0);
   }
 
   Widget _buildAQILiveChart() {

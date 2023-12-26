@@ -29,7 +29,7 @@ extension ImagesPath on ImageApp {
       return 'assets/imgs/$name';
     }
     if (name.contains('.json')) {
-      return 'jsons/$name';
+      return 'assets/jsons/$name';
     }
     return 'assets/imgs/$name';
   }
