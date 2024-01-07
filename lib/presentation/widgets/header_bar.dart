@@ -55,12 +55,12 @@ class HeaderBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
         bottom: PreferredSize(
+            preferredSize: preferredSize,
             child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.only(left: MarginApp.m16),
                 alignment: Alignment.centerLeft,
-                child: titleWidget),
-            preferredSize: preferredSize),
+                child: titleWidget)),
         toolbarHeight: hideAppBar ? 0 : height,
         backgroundColor: backgroundColor,
         elevation: elevation,

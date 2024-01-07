@@ -5,10 +5,10 @@ class HomeState {
   final int pm1Live;
   final int pm10Live;
   final int pm25Live;
-  final Map<DateTime, int> aqiHourData;
-  final Map<DateTime, double> pm1HourData;
-  final Map<DateTime, double> pm10HourData;
-  final Map<DateTime, double> pm25HourData;
+  final Map<String, int> aqiHourData;
+  final Map<String, double> pm1HourData;
+  final Map<String, double> pm10HourData;
+  final Map<String, double> pm25HourData;
 
   final int aqiPredict;
   final List<AQIChart> aqiPredictData;
@@ -37,10 +37,10 @@ class HomeState {
     int? pm1Live,
     int? pm10Live,
     int? pm25Live,
-    Map<DateTime, int>? aqiHourData,
-    Map<DateTime, double>? pm1HourData,
-    Map<DateTime, double>? pm10HourData,
-    Map<DateTime, double>? pm25HourData,
+    Map<String, int>? aqiHourData,
+    Map<String, double>? pm1HourData,
+    Map<String, double>? pm10HourData,
+    Map<String, double>? pm25HourData,
     int? aqiPredict,
     List<AQIChart>? aqiPredictData,
     List<AQIChart>? pm1PredictData,

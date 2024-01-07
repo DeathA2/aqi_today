@@ -10,7 +10,6 @@ import 'package:aqi_today/src/texts/string_manager.dart';
 import 'package:aqi_today/src/value/value_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:lottie/lottie.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -350,6 +349,13 @@ class _HomeScreenState extends State<HomeScreen> {
           width: 200,
           height: 200,
           color: setColor(state),
+          child: Center(
+            child: Text(
+              _setText(state),
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: FontSizeApp.s30),
+            ),
+          ),
         );
       },
     );
@@ -624,5 +630,14 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
     );
+  }
+
+  String _setText(int aqi) {
+    if (aqi > 300) return "Hazardous";
+    if (aqi > 200) return "Very Unhealthy";
+    if (aqi > 150) return "Unhealthy";
+    if (aqi > 100) return "Unhealthy for Sensitive Groups";
+    if (aqi > 50) return "Moderate";
+    return "Good";
   }
 }

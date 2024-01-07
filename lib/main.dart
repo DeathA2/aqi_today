@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
         title: 'AQI Today',
         home: BlocProvider(
           create: (context) => HomeCubit(),
-          child: HomeScreen(),
+          child: const HomeScreen(),
         ));
   }
 }

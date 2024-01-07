@@ -50,8 +50,8 @@ class HomeCubit extends Cubit<HomeState> {
     final pm25Live = FirebaseDatabase.instance.ref('value/pm25');
     final aqiPredict = FirebaseDatabase.instance.ref('AQI_predict_today/AQI');
     _aqiLiveSubscription = aqiLive.onValue.listen((event) {
-      final data = event.snapshot.value;
-      setAQILive(int.parse(data.toString()));
+      final data = event.snapshot.value as Map;
+      setAQILive(int.parse(data["AQI_${DateTime.now().hour}"].toString()));
     });
     _aqiPredictSubscription = aqiPredict.onValue.listen((event) {
       final data = event.snapshot.value;
@@ -81,26 +81,65 @@ class HomeCubit extends Cubit<HomeState> {
     final pm25PrerdictData = FirebaseDatabase.instance.ref('predict/pm25');
 
     aqiHourData.onValue.listen((event) {
-      final listData = state.aqiHourData;
-      listData.addAll({DateTime.now() : event.snapshot.value as int});
+      Map<String, int> listData = {};
+      final data = event.snapshot.value as Map;
+      for (int i = DateTime.now().hour; i <= 23; i++) {
+        listData.addAll({i.toString(): (data["AQI_$i"] ?? 0) as int});
+      }
+      for (int i = 0; i <= DateTime.now().hour; i++) {
+        listData.addAll({
+          i == 0 ? DateFormat('d/M').format(DateTime.now()) : i.toString():
+              (data["AQI_$i"] ?? 0) as int
+        });
+      }
       setAQIHourDataChart(listData);
     });
 
     pm1HourtData.onValue.listen((event) {
-      final listData = state.pm1HourData;
-      listData.addAll({DateTime.now() : event.snapshot.value as double});
+      Map<String, double> listData = {};
+      final data = event.snapshot.value as Map;
+      // int _hour = int.parse(hour.key!.split('_').last);
+      for (int i = DateTime.now().hour; i <= 23; i++) {
+        listData.addAll({i.toString(): (data["pm1_$i"] ?? 0) as double});
+      }
+      for (int i = 0; i <= DateTime.now().hour; i++) {
+        listData.addAll({
+          i == 0 ? DateFormat('d/M').format(DateTime.now()) : i.toString():
+              (data["pm1_$i"] ?? 0) as double
+        });
+      }
       setPM1HourDataChart(listData);
     });
 
     pm10HourtData.onValue.listen((event) {
-      final listData = state.pm10HourData;
-      listData.addAll({DateTime.now() : event.snapshot.value as double});
+      Map<String, double> listData = {};
+      final data = event.snapshot.value as Map;
+      // int _hour = int.parse(hour.key!.split('_').last);
+      for (int i = DateTime.now().hour; i <= 23; i++) {
+        listData.addAll({i.toString(): (data["pm10_$i"] ?? 0) as double});
+      }
+      for (int i = 0; i <= DateTime.now().hour; i++) {
+        listData.addAll({
+          i == 0 ? DateFormat('d/M').format(DateTime.now()) : i.toString():
+              (data["pm10_$i"] ?? 0) as double
+        });
+      }
       setPM10HourDataChart(listData);
     });
 
     pm25HourtData.onValue.listen((event) {
-      final listData = state.pm25HourData;
-      listData.addAll({DateTime.now() : event.snapshot.value as double});
+      Map<String, double> listData = {};
+      final data = event.snapshot.value as Map;
+      // int _hour = int.parse(hour.key!.split('_').last);
+      for (int i = DateTime.now().hour; i <= 23; i++) {
+        listData.addAll({i.toString(): (data["pm25_$i"] ?? 0) as double});
+      }
+      for (int i = 0; i <= DateTime.now().hour; i++) {
+        listData.addAll({
+          i == 0 ? DateFormat('d/M').format(DateTime.now()) : i.toString():
+              (data["pm25_$i"] ?? 0) as double
+        });
+      }
       setPM25HourDataChart(listData);
     });
 
@@ -132,77 +171,89 @@ class HomeCubit extends Cubit<HomeState> {
     });
   }
 
-  void setAQIHourDataChart(Map<DateTime, int> data) {
+  void setAQIHourDataChart(Map<String, int> data) {
     emit(state.copyWith(aqiHourData: data));
   }
 
-  void setPM1HourDataChart(Map<DateTime, double> data) {
+  void setPM1HourDataChart(Map<String, double> data) {
     emit(state.copyWith(pm1HourData: data));
   }
 
-  void setPM10HourDataChart(Map<DateTime, double> data) {
+  void setPM10HourDataChart(Map<String, double> data) {
     emit(state.copyWith(pm10HourData: data));
   }
 
-  void setPM25HourDataChart(Map<DateTime, double> data) {
+  void setPM25HourDataChart(Map<String, double> data) {
     emit(state.copyWith(pm25HourData: data));
   }
 
-  List<AQIChart> getAQIHourDataChart(){
+  List<AQIChart> getAQIHourDataChart() {
     List<AQIChart> _listDataChart = [];
     final _data = state.aqiHourData;
-    _data.forEach((key, value){
-      _listDataChart.add(AQIChart(key.hour == 0 ? DateFormat('d/M').format(key) : key.hour.toString(), value as double));
+    _data.forEach((key, value) {
+      _listDataChart.add(AQIChart(key, value as double));
     });
-    if (_listDataChart.length > 24){
-      return _listDataChart.getRange(_listDataChart.length - 24, _listDataChart.length).toList();
-    } else if(_listDataChart.length < 24){
-      List<AQIChart> _emptyList = List.filled(24 - _listDataChart.length, AQIChart('NaN', 0));
+    if (_listDataChart.length > 24) {
+      return _listDataChart
+          .getRange(_listDataChart.length - 24, _listDataChart.length)
+          .toList();
+    } else if (_listDataChart.length < 24) {
+      List<AQIChart> _emptyList =
+          List.filled(24 - _listDataChart.length, AQIChart('NaN', 0));
       return _emptyList.followedBy(_listDataChart).toList();
     }
     return _listDataChart;
   }
 
-  List<AQIChart> getPM1HourDataChart(){
+  List<AQIChart> getPM1HourDataChart() {
     List<AQIChart> _listDataChart = [];
     final _data = state.pm1HourData;
-    _data.forEach((key, value){
-      _listDataChart.add(AQIChart(key.hour == 0 ? DateFormat('d/M').format(key) : key.hour.toString(), value));
+    _data.forEach((key, value) {
+      _listDataChart.add(AQIChart(key, value));
     });
-    if (_listDataChart.length > 24){
-      return _listDataChart.getRange(_listDataChart.length - 24, _listDataChart.length).toList();
-    } else if(_listDataChart.length < 24){
-      List<AQIChart> _emptyList = List.filled(24 - _listDataChart.length, AQIChart('NaN', 0));
+    if (_listDataChart.length > 24) {
+      return _listDataChart
+          .getRange(_listDataChart.length - 24, _listDataChart.length)
+          .toList();
+    } else if (_listDataChart.length < 24) {
+      List<AQIChart> _emptyList =
+          List.filled(24 - _listDataChart.length, AQIChart('NaN', 0));
       return _emptyList.followedBy(_listDataChart).toList();
     }
     return _listDataChart;
   }
 
-  List<AQIChart> getPM10HourDataChart(){
+  List<AQIChart> getPM10HourDataChart() {
     List<AQIChart> _listDataChart = [];
     final _data = state.pm10HourData;
-    _data.forEach((key, value){
-      _listDataChart.add(AQIChart(key.hour == 0 ? DateFormat('d/M').format(key) : key.hour.toString(), value));
+    _data.forEach((key, value) {
+      _listDataChart.add(AQIChart(key, value));
     });
-    if (_listDataChart.length > 24){
-      return _listDataChart.getRange(_listDataChart.length - 24, _listDataChart.length).toList();
-    } else if(_listDataChart.length < 24){
-      List<AQIChart> _emptyList = List.filled(24 - _listDataChart.length, AQIChart('NaN', 0));
+    if (_listDataChart.length > 24) {
+      return _listDataChart
+          .getRange(_listDataChart.length - 24, _listDataChart.length)
+          .toList();
+    } else if (_listDataChart.length < 24) {
+      List<AQIChart> _emptyList =
+          List.filled(24 - _listDataChart.length, AQIChart('NaN', 0));
       return _emptyList.followedBy(_listDataChart).toList();
     }
     return _listDataChart;
   }
 
-  List<AQIChart> getPM25HourDataChart(){
+  List<AQIChart> getPM25HourDataChart() {
     List<AQIChart> _listDataChart = [];
     final _data = state.pm25HourData;
-    _data.forEach((key, value){
-      _listDataChart.add(AQIChart(key.hour == 0 ? DateFormat('d/M').format(key) : key.hour.toString(), value));
+    _data.forEach((key, value) {
+      _listDataChart.add(AQIChart(key, value));
     });
-    if (_listDataChart.length > 24){
-      return _listDataChart.getRange(_listDataChart.length - 24, _listDataChart.length).toList();
-    } else if(_listDataChart.length < 24){
-      List<AQIChart> _emptyList = List.filled(24 - _listDataChart.length, AQIChart('NaN', 0));
+    if (_listDataChart.length > 24) {
+      return _listDataChart
+          .getRange(_listDataChart.length - 24, _listDataChart.length)
+          .toList();
+    } else if (_listDataChart.length < 24) {
+      List<AQIChart> _emptyList =
+          List.filled(24 - _listDataChart.length, AQIChart('NaN', 0));
       return _emptyList.followedBy(_listDataChart).toList();
     }
     return _listDataChart;
